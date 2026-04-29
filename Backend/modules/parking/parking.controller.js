@@ -2,7 +2,7 @@ import {
   checkAvailabilityService,
   getAvailableSlotCountService,
   createEntryService,
-  findSessionService,
+  findActiveSessionService,
   exitService,
 } from "./parking.service.js";
 
@@ -12,12 +12,12 @@ export const checkAvailability = async (req, res) => {
 };
 
 export const getAvailableSlotCount = async (req, res) => {
-  const slotCount = await getAvailableSlotCountService();
-  res.json({ slotCount });
+  const availableslotCount = await getAvailableSlotCountService();
+  res.json({ availableslotCount });
 };
 
 export const createEntry = async (req, res) => {
-  const { session, slot } = await createEntryService();
+  const { session, slot } = await createEntryService(req.body);
   res.json({
     message: "Entry Successfull",
     sessionId: session.sessionId,
@@ -26,7 +26,9 @@ export const createEntry = async (req, res) => {
 };
 
 export const findSession = async (req, res) => {
-  const { session, duration, amount } = await findSessionService(req.body);
+  const { session, duration, amount } = await findActiveSessionService(
+    req.body,
+  );
   res.json({
     sessionId: session.sessionId,
     slot: session.slotId.slotNumber,

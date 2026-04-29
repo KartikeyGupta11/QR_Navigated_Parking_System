@@ -13,7 +13,7 @@ export const getAvailableSlotCountService = async () => {
   return count;
 };
 
-export const createEntryService = async ({ carNumber, phone }) => {
+export const createEntryService = async ({ carNumber, phone, email }) => {
   const existing = await ParkingSession.findOne({
     carNumber,
     status: "ACTIVE",
@@ -31,7 +31,7 @@ export const createEntryService = async ({ carNumber, phone }) => {
       isOccupied: true,
     },
     {
-      new: true,
+      returnDocument: "after",
     },
   );
 
@@ -50,7 +50,7 @@ export const createEntryService = async ({ carNumber, phone }) => {
   return { session, slot };
 };
 
-export const findSessionService = async ({ carNumber, phone, email }) => {
+export const findActiveSessionService = async ({ carNumber, phone, email }) => {
   const session = await ParkingSession.findOne({
     carNumber,
     phone,
