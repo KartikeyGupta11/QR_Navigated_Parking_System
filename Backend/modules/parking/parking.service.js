@@ -73,15 +73,43 @@ export const exitService = async ({ sessionId }) => {
     throw new Error("Invalid Session");
   }
 
+  if (session.paymentStatus !== "PAID") {
+    throw new Error("Payment required before exit");
+  }
+
   session.exitTime = new Date();
   session.status = "COMPLETED";
-  session.paymentStatus = "PAID";
 
   await session.save();
 
   await Slot.findByIdAndUpdate(session.slotId, {
     isOccupied: false,
   });
+
+  return session;
+};
+
+export const paymentService = async ({ sessionId }) => {
+  const session = await ParkingSession.findOne({ sessionId });
+  console.log(session);
+
+  if (!session || session.status !== "ACTIVE") {
+    throw new Error("Invalid Session");
+  }
+
+  if (session.paymentStatus === "PAID") {
+    throw new Error("Payment Already Done");
+  }
+
+  const { amount } = calculateAmount(session.entryTime);
+
+  session.amount = amount;
+  session.paymentStatus = "PAID";
+
+  const now = new Date();
+  session.paymentTime = now;
+
+  await session.save();
 
   return session;
 };

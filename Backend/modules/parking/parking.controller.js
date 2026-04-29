@@ -4,6 +4,7 @@ import {
   createEntryService,
   findActiveSessionService,
   exitService,
+  paymentService,
 } from "./parking.service.js";
 
 export const checkAvailability = async (req, res) => {
@@ -41,4 +42,14 @@ export const findSession = async (req, res) => {
 export const exitParking = async (req, res) => {
   await exitService(req.body);
   res.json({ message: "Exit Successfull" });
+};
+
+export const makePayment = async (req, res) => {
+  const session = await paymentService(req.body);
+
+  res.json({
+    message: "Payment Successfull...",
+    amount: session.amount,
+    sessionId: session.sessionId,
+  });
 };
