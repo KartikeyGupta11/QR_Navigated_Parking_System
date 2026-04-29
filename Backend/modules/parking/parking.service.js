@@ -91,7 +91,6 @@ export const exitService = async ({ sessionId }) => {
 
 export const paymentService = async ({ sessionId }) => {
   const session = await ParkingSession.findOne({ sessionId });
-  console.log(session);
 
   if (!session || session.status !== "ACTIVE") {
     throw new Error("Invalid Session");
