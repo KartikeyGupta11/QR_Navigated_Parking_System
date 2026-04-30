@@ -71,7 +71,7 @@ export default function Entry() {
 
         {result && (
           <div className="mt-5 p-3 bg-green-100 text-green-700 rounded-lg text-center text-sm">
-            ✅ Slot Assigned: <b>{result.slot}</b>
+            ✅ Slot Assigned: <b>{result.slotNumber}</b>
           </div>
         )}
       </div>
