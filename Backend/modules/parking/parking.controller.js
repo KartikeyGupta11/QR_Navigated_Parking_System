@@ -5,6 +5,8 @@ import {
   findActiveSessionService,
   exitService,
   paymentService,
+  getEntryQRService,
+  getExitQRService,
 } from "./parking.service.js";
 import { asyncHandler } from "../../middlewares/asyncHandler.js";
 
@@ -54,3 +56,13 @@ export const makePayment = asyncHandler(async (req, res) => {
     sessionId: session.sessionId,
   });
 });
+
+export const getEntryQR = async (req, res) => {
+  const qr = await getEntryQRService();
+  res.json({ qr });
+};
+
+export const getExitQR = async (req, res) => {
+  const qr = await getExitQRService();
+  res.json({ qr });
+};

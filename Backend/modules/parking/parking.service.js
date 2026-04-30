@@ -2,6 +2,9 @@ import Slot from "../../models/slot.model.js";
 import ParkingSession from "./parking.model.js";
 import { generateSessionId } from "../../utils/generateSessionId.js";
 import { calculateAmount } from "../../utils/calculateAmount.js";
+import { generateQR } from "../../utils/generateQR.js";
+
+const BASE_URL = process.env.FRONTEND_URL || "http://localhost:5000";
 
 export const checkAvailabilityService = async () => {
   const slot = await Slot.findOne({ isOccupied: false }).lean();
@@ -111,4 +114,14 @@ export const paymentService = async ({ sessionId }) => {
   await session.save();
 
   return session;
+};
+
+export const getEntryQRService = async () => {
+  const url = `${BASE_URL}/entry`;
+  return await generateQR(url);
+};
+
+export const getExitQRService = async () => {
+  const url = `${BASE_URL}/exit`;
+  return await generateQR(url);
 };
