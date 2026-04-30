@@ -53,11 +53,10 @@ export const createEntryService = async ({ carNumber, phone, email }) => {
   return { session, slot };
 };
 
-export const findActiveSessionService = async ({ carNumber, phone, email }) => {
+export const findActiveSessionService = async ({ carNumber, phone }) => {
   const session = await ParkingSession.findOne({
     carNumber,
     phone,
-    email,
     status: "ACTIVE",
   }).populate("slotId");
 

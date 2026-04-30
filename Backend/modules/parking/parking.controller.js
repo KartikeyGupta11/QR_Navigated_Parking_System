@@ -25,7 +25,7 @@ export const createEntry = asyncHandler(async (req, res) => {
   res.json({
     message: "Entry Successfull",
     sessionId: session.sessionId,
-    slot: slot.slotNumber,
+    slotNumber: slot.slotNumber,
   });
 });
 
