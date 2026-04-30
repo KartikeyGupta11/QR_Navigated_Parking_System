@@ -6,6 +6,7 @@ import {
   exitService,
   paymentService,
 } from "./parking.service.js";
+import { asyncHandler } from "../../middlewares/asyncHandler.js";
 
 export const checkAvailability = async (req, res) => {
   const available = await checkAvailabilityService();
@@ -17,16 +18,16 @@ export const getAvailableSlotCount = async (req, res) => {
   res.json({ availableslotCount });
 };
 
-export const createEntry = async (req, res) => {
+export const createEntry = asyncHandler(async (req, res) => {
   const { session, slot } = await createEntryService(req.body);
   res.json({
     message: "Entry Successfull",
     sessionId: session.sessionId,
     slot: slot.slotNumber,
   });
-};
+});
 
-export const findSession = async (req, res) => {
+export const findSession = asyncHandler(async (req, res) => {
   const { session, duration, amount } = await findActiveSessionService(
     req.body,
   );
@@ -37,14 +38,14 @@ export const findSession = async (req, res) => {
     duration,
     amount,
   });
-};
+});
 
-export const exitParking = async (req, res) => {
+export const exitParking = asyncHandler(async (req, res) => {
   await exitService(req.body);
   res.json({ message: "Exit Successfull" });
-};
+});
 
-export const makePayment = async (req, res) => {
+export const makePayment = asyncHandler(async (req, res) => {
   const session = await paymentService(req.body);
 
   res.json({
@@ -52,4 +53,4 @@ export const makePayment = async (req, res) => {
     amount: session.amount,
     sessionId: session.sessionId,
   });
-};
+});
