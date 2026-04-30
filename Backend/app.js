@@ -12,8 +12,8 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(errorHandler);
 
 app.use("/api/parking", parkingRoutes);
+app.use(errorHandler);
 
 export default app;
