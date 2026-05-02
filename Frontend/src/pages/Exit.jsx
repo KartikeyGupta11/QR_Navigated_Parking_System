@@ -4,8 +4,11 @@ import Input from "../components/Input";
 import Button from "../components/Buttons";
 import { exitParking, findSession, makePayment } from "../api/parking.api";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function Exit() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     carNumber: "",
     phone: "",
@@ -35,23 +38,14 @@ export default function Exit() {
     }
   };
 
-  const handlePayment = async () => {
-    try {
-      setLoading(true);
-
-      await makePayment({ sessionId });
-      await exitParking({ sessionId });
-
-      toast.success("Exit Successful 🚪");
-
-      setAmount(null);
-      setSessionId(null);
-      setForm({ carNumber: "", phone: "" });
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleProceed = () => {
+    navigate("/payment", {
+      state: {
+        sessionId,
+        amount,
+        carNumber: form.carNumber,
+      },
+    });
   };
 
   return (
@@ -91,10 +85,9 @@ export default function Exit() {
 
             <div className="mt-4">
               <Button
-                text={loading ? "Processing..." : "Pay & Exit"}
-                onClick={handlePayment}
+                text="Proceed to Payment"
+                onClick={handleProceed}
                 color="green"
-                disabled={loading}
               />
             </div>
           </>
