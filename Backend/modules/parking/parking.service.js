@@ -3,6 +3,11 @@ import ParkingSession from "./parking.model.js";
 import { generateSessionId } from "../../utils/generateSessionId.js";
 import { calculateAmount } from "../../utils/calculateAmount.js";
 import { generateQR } from "../../utils/generateQR.js";
+import { sendEmail } from "../../utils/sendEmail.js";
+import {
+  generateReceiptHTML,
+  generateEntryHTML,
+} from "../../utils/emailTemplate.js";
 
 const BASE_URL = process.env.FRONTEND_URL || "http://localhost:5000";
 
@@ -50,6 +55,20 @@ export const createEntryService = async ({ carNumber, phone, email }) => {
     slotId: slot._id,
   });
 
+  if (email) {
+    const html = generateEntryHTML({
+      carNumber,
+      slot: slot.slotNumber,
+    });
+
+    await sendEmail({
+      to: email,
+      subject: "Parking Slot Confirmed...",
+      text: `Welcome! Your parking slot is ${slot.slotNumber}`,
+      html,
+    });
+  }
+
   return { session, slot };
 };
 
@@ -87,6 +106,23 @@ export const exitService = async ({ sessionId }) => {
   await Slot.findByIdAndUpdate(session.slotId, {
     isOccupied: false,
   });
+
+  if (session.email) {
+    const html = generateReceiptHTML({
+      carNumber: session.carNumber,
+      slot: session.slotNumber,
+      entryTime: session.entryTime,
+      exitTime: session.exitTime,
+      amount: session.amount,
+    });
+
+    await sendEmail({
+      to: session.email,
+      subject: "Parking Exit Successfull...",
+      text: `Thankyou for visiting.\n\nCar: ${session.carNumber}\nAmount Paid: ₹${session.amount}`,
+      html,
+    });
+  }
 
   return session;
 };

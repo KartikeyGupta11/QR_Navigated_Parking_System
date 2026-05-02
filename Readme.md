@@ -1,33 +1,32 @@
-# 🚗 QR Navigated Parking System
+# 🚗 SPARK Navigated Parking System
+
+## 🌐 Live Demo
+
+🔗 https://qr-navigated-parking-system-l565cefln.vercel.app/
+
+---
 
 ## 📌 Overview
 
-A smart parking management system built using the MERN stack that enables users to enter and exit parking areas using QR codes. The system follows a **metro-style flow**, where users can park first and pay later at exit based on the time spent.
+A **full-stack smart parking management system** built using the MERN stack that allows users to enter and exit parking areas using QR codes.
 
-Designed with **low infrastructure dependency**, this system eliminates the need for expensive hardware like RFID or sensors.
+The system follows a **metro-style flow**:
+👉 Park first → Pay later → Exit smoothly
+
+Designed with **low infrastructure dependency**, eliminating the need for RFID cards or physical sensors.
 
 ---
 
 ## 🚀 Features
 
-### 🔹 User Flow
+### 🔹 Core Functionality
 
-- 📲 QR-based entry system
+- 📲 QR-based Entry & Exit system
 - 🚗 Automatic slot allocation (no manual selection)
 - ⛔ Real-time parking availability check
 - 💳 Pay-on-exit billing system
-- 📧 Email capture for user reference
-- 🔐 Duplicate entry prevention (same car cannot enter twice)
-
----
-
-### 🔹 Exit Flow (Metro-Style)
-
-- Scan QR at exit
-- Fetch active parking session
-- Calculate parking fee dynamically
-- Complete payment (cash/manual for now)
-- Exit validation before leaving
+- 🔐 Duplicate entry prevention
+- 📧 Optional email capture
 
 ---
 
@@ -35,16 +34,17 @@ Designed with **low infrastructure dependency**, this system eliminates the need
 
 - First **15 minutes FREE**
 - After that: **₹10 per 30 minutes**
-- Uses **ceil logic** (rounds up to next block)
+- Uses **ceil logic** (rounded billing blocks)
 
 ---
 
 ### 🔹 System Design Highlights
 
 - ⚡ Atomic slot allocation (prevents double booking)
-- 🆔 Unique session tracking using UUID
-- 📦 Modular backend architecture (scalable)
-- 🔄 Separation of concerns (services, controllers, routes)
+- 🆔 Unique session tracking (UUID)
+- 📦 Modular backend architecture
+- 🔄 Clean separation (controllers, services, routes)
+- 🌍 Fully deployed (Frontend + Backend)
 
 ---
 
@@ -52,97 +52,101 @@ Designed with **low infrastructure dependency**, this system eliminates the need
 
 ### 🚪 Entry Flow
 
-1. User scans QR at parking entrance
-2. System checks availability
-3. User confirms entry
-4. Slot is auto-assigned
-5. Parking session starts
+1. User scans Entry QR
+2. Redirected to Entry page
+3. Enters car details
+4. Slot auto-assigned
+5. Session starts
 
 ---
 
 ### 🚗 Exit Flow
 
-1. User scans QR at exit
-2. Enters car number + phone
+1. User scans Exit QR
+2. Enters details
 3. System fetches active session
-4. Displays duration & amount
-5. Payment is completed
-6. Exit is validated and slot is freed
+4. Displays amount
+5. Payment completed
+6. Slot released
+
+---
+
+## 🖼️ Screenshots
+
+> _(Add screenshots here)_
+
+- Home (QR screen)
+- Entry page
+- Exit page
+- Payment flow
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB (Mongoose)
-- **Architecture:** Modular (Service-based)
-- **ID System:** UUID for session tracking
-- **API Testing:** Postman
+### 🔹 Frontend
+
+- React (Vite)
+- Tailwind CSS
+- Axios
+
+### 🔹 Backend
+
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
 
 ---
 
 ## 📂 Project Structure
 
 ```
-server/
+QR_Navigated_Parking_System/
 │
-├── src/
-│   ├── config/              # Database connection
-│   ├── models/              # Slot model
+├── Backend/
 │   ├── modules/
-│   │   └── parking/         # Parking feature module
-│   │       ├── controller
-│   │       ├── service
-│   │       ├── routes
-│   │       └── model
-│   ├── utils/               # Helpers (ID, billing)
+│   ├── models/
 │   ├── middlewares/
-│   ├── seed/                # Seeder scripts
-│   ├── app.js
+│   ├── utils/
 │   └── server.js
+│
+├── Frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   ├── api/
+│   │   └── layouts/
+│   └── index.html
 ```
 
 ---
 
 ## ⚙️ Setup Instructions
 
-### 1. Clone the Repository
+### 1️⃣ Clone Repo
 
 ```bash
 git clone <your-repo-url>
-cd server
 ```
 
 ---
 
-### 2. Install Dependencies
+### 2️⃣ Backend Setup
 
 ```bash
+cd Backend
 npm install
 ```
 
----
-
-### 3. Configure Environment Variables
-
-Create `.env` file:
+Create `.env`:
 
 ```
 PORT=5000
-MONGO_URI=your_mongodb_connection_string
+MONGO_URI=your_mongo_uri
+FRONTEND_URL=http://localhost:5173
 ```
 
----
-
-### 4. Seed Parking Slots
-
-```bash
-node src/seed/seedSlots.js
-```
-
----
-
-### 5. Run the Server
+Run:
 
 ```bash
 npm run dev
@@ -150,78 +154,65 @@ npm run dev
 
 ---
 
+### 3️⃣ Frontend Setup
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+---
+
 ## 📡 API Endpoints
 
-### 🔹 Availability
+| Method | Endpoint                         | Description             |
+| ------ | -------------------------------- | ----------------------- |
+| GET    | /api/parking/check-availability  | Check slot availability |
+| POST   | /api/parking/entry               | Create entry session    |
+| POST   | /api/parking/find-active-session | Find active session     |
+| POST   | /api/parking/make-payment        | Complete payment        |
+| POST   | /api/parking/exit                | Exit parking            |
 
-```
-GET /api/parking/availability
-```
+---
 
-### 🔹 Entry
+## 🚀 Deployment
 
-```
-POST /api/parking/entry
-```
-
-### 🔹 Find Active Session
-
-```
-POST /api/parking/find
-```
-
-### 🔹 Payment (Planned / Optional)
-
-```
-POST /api/parking/payment
-```
-
-### 🔹 Exit
-
-```
-POST /api/parking/exit
-```
+- Frontend: Vercel
+- Backend: Render
 
 ---
 
 ## 🧠 Key Design Decisions
 
-- Used **UUID for sessionId** to avoid collisions and ensure security
-- Used **atomic database operations** to prevent multiple users getting same slot
-- Separated **payment and exit logic** for flexibility and scalability
-- Chose **QR-based system** to eliminate hardware dependency
+- Used UUID for secure session tracking
+- Atomic DB operations to avoid race conditions
+- Separated payment & exit logic
+- QR-based flow for low-cost deployment
 
 ---
 
 ## 🔮 Future Enhancements
 
-- 💳 Online payment integration (Stripe/Razorpay)
-- 📊 Admin dashboard with analytics
-- 📍 Parking navigation with maps
-- 📱 PWA / mobile optimization
-- 🔔 Notifications (Email/SMS)
+- 📩 Email notifications (Entry + Receipt)
+- 💳 Payment gateway integration
+- 📊 Admin dashboard
+- 📱 Mobile optimization
+- 📍 Smart navigation
 
 ---
 
-## 🎯 Project Goal
+## 🎯 Goal
 
-To build a **real-world, scalable parking system** that can be deployed in:
+To build a **real-world deployable parking solution** usable in:
 
 - Apartments
-- Small malls
 - Offices
 - Colleges
-
-without requiring expensive infrastructure.
-
----
-
-## 🤝 Contribution
-
-Contributions, ideas, and improvements are welcome!
+- Small malls
 
 ---
 
 ## 📄 License
 
-This project is open-source and available under the MIT License.
+MIT License
