@@ -52,11 +52,16 @@ export default function Exit() {
 
   return (
     <MainLayout>
-      <div className="flex justify-center items-center min-h-[80vh]">
+      <div
+        className="flex justify-center items-center min-h-[80vh] 
+                    bg-gray-100 dark:bg-gray-900 transition"
+      >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 rounded-2xl shadow-lg w-[360px]"
+          className="bg-white dark:bg-gray-800 
+                   text-black dark:text-white
+                   p-8 rounded-2xl shadow-lg w-[360px] transition"
         >
           <div className="text-center mb-5">
             <div className="flex justify-center items-center gap-2 mb-2">
@@ -64,18 +69,22 @@ export default function Exit() {
                 animate={{ x: [0, 8, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
               >
-                <Car className="text-red-500 w-6 h-6" />
+                <Car className="text-red-500 dark:text-red-400 w-6 h-6" />
               </motion.div>
 
               <h2 className="text-xl font-bold">Parking Exit</h2>
             </div>
 
-            <p className="text-sm text-gray-500">Complete payment to exit</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Complete payment to exit
+            </p>
           </div>
 
           <div className="space-y-3">
             <div>
-              <label className="text-sm font-medium">Car Number</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Car Number
+              </label>
               <Input
                 placeholder="e.g. UP32AB1234"
                 value={form.carNumber}
@@ -86,7 +95,9 @@ export default function Exit() {
             </div>
 
             <div>
-              <label className="text-sm font-medium">Phone Number</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Phone Number
+              </label>
               <Input
                 placeholder="10-digit number"
                 value={form.phone}
@@ -95,7 +106,9 @@ export default function Exit() {
             </div>
           </div>
 
-          {amount === null ? (
+          {loading ? (
+            <Skeleton className="w-full h-16 mt-5 rounded-lg" />
+          ) : amount === null ? (
             <div className="mt-5">
               <Button
                 text="Check Details"
@@ -108,9 +121,20 @@ export default function Exit() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="mt-5 p-4 bg-yellow-100 rounded-lg text-center">
-                <p className="text-sm text-gray-600">Amount Payable</p>
-                <p className="text-xl font-bold text-yellow-700">₹{amount}</p>
+              <div
+                className="mt-5 p-4 
+                            bg-yellow-100 dark:bg-yellow-900/40 
+                            rounded-lg text-center"
+              >
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Amount Payable
+                </p>
+                <p
+                  className="text-xl font-bold 
+                            text-yellow-700 dark:text-yellow-300"
+                >
+                  ₹{amount}
+                </p>
               </div>
 
               <div className="mt-4">

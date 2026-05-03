@@ -37,7 +37,7 @@ export const generateEntryHTML = ({ carNumber, slot }) => {
 
 export const generateReceiptHTML = ({
   carNumber,
-  slotNumber,
+  slot,
   entryTime,
   exitTime,
   amount,
@@ -51,7 +51,7 @@ export const generateReceiptHTML = ({
         <hr />
 
         <p><strong>Car Number:</strong> ${carNumber}</p>
-        <p><strong>Slot:</strong> ${slotNumber}</p>
+        <p><strong>Slot:</strong> ${slot}</p>
         <p><strong>Entry Time:</strong> ${new Date(entryTime).toLocaleString()}</p>
         <p><strong>Exit Time:</strong> ${new Date(exitTime).toLocaleString()}</p>
 

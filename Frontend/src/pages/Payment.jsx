@@ -16,7 +16,9 @@ export default function Payment() {
   if (!state) {
     return (
       <MainLayout>
-        <div className="text-center mt-10">No Parking Session found...</div>
+        <div className="text-center mt-10 text-black dark:text-white">
+          No Parking Session found...
+        </div>
       </MainLayout>
     );
   }
@@ -45,49 +47,59 @@ export default function Payment() {
 
   return (
     <MainLayout>
-      <div className="flex justify-center items-center min-h-[80vh]">
+      <div
+        className="flex justify-center items-center min-h-[80vh] 
+                    bg-gray-100 dark:bg-gray-900 transition"
+      >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 rounded-2xl shadow-lg w-[360px]"
+          className="bg-white dark:bg-gray-800 
+                   text-black dark:text-white
+                   p-8 rounded-2xl shadow-lg w-[360px] transition"
         >
-          {/* 💳 Header */}
           <div className="text-center mb-6">
             <div className="flex justify-center items-center gap-2 mb-2">
               <motion.div
                 animate={{ y: [0, -4, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
               >
-                <CreditCard className="text-green-600 w-6 h-6" />
+                <CreditCard className="text-green-600 dark:text-green-400 w-6 h-6" />
               </motion.div>
 
               <h2 className="text-xl font-bold">Confirm Payment</h2>
             </div>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Review details before exiting
             </p>
           </div>
 
-          {/* 🚗 Details Card */}
-          <div className="bg-gray-100 p-4 rounded-lg mb-5 space-y-2">
+          <div
+            className="bg-gray-100 dark:bg-gray-700 
+                        p-4 rounded-lg mb-5 space-y-2"
+          >
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Car Number</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Car Number
+              </span>
               <span className="font-medium">{carNumber}</span>
             </div>
 
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Parking Fee</span>
-              <span className="font-bold text-green-700">₹{amount}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Parking Fee
+              </span>
+              <span className="font-bold text-green-700 dark:text-green-400">
+                ₹{amount}
+              </span>
             </div>
           </div>
 
-          {/* ⚠️ Note */}
-          <p className="text-xs text-gray-500 text-center mb-4">
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4">
             Once payment is completed, your exit will be recorded automatically
           </p>
 
-          {/* 🔘 Button */}
           <Button
             text="Pay & Exit"
             loading={loading}

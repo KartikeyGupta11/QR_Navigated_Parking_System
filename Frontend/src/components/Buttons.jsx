@@ -1,18 +1,3 @@
-// export default function Button({ text, onClick, color = "blue" }) {
-//   return (
-//     <button
-//       onClick={onClick}
-//       className={`w-full text-white p-2 rounded-md ${
-//         color === "blue"
-//           ? "bg-blue-500 hover:bg-blue-600"
-//           : "bg-green-500 hover:bg-green-600"
-//       }`}
-//     >
-//       {text}
-//     </button>
-//   );
-// }
-
 import { motion } from "framer-motion";
 
 export default function Button({
@@ -20,25 +5,40 @@ export default function Button({
   onClick,
   color = "blue",
   loading = false,
+  disabled = false,
 }) {
-  const base = "w-full py-2 rounded-lg font-semibold text-white transition";
+  const base =
+    "w-full py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition duration-200 cursor-pointer";
 
   const colors = {
-    blue: "bg-blue-600 hover:bg-blue-700",
-    green: "bg-green-600 hover:bg-green-700",
+    blue: "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg",
+    green:
+      "bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg",
+    gray: "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
   };
 
   return (
     <motion.button
       whileTap={{ scale: 0.95 }}
-      whileHover={{ scale: 1.02 }}
+      whileHover={!disabled && !loading ? { scale: 1.03 } : {}}
       className={`${base} ${colors[color]} ${
-        loading ? "opacity-70 cursor-not-allowed" : ""
+        loading || disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
       }`}
       onClick={onClick}
-      disabled={loading}
+      disabled={loading || disabled}
     >
-      {loading ? "Processing..." : text}
+      {loading && (
+        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+      )}
+
+      {loading ? (
+        <div className="flex items-center gap-2">
+          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          Processing...
+        </div>
+      ) : (
+        text
+      )}
     </motion.button>
   );
 }
