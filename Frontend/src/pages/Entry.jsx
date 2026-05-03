@@ -7,7 +7,13 @@ import toast from "react-hot-toast";
 import Card from "../components/Card";
 import { motion } from "framer-motion";
 import { Car } from "lucide-react";
-import { formatCarNumber, isValidPhone } from "../utils/format";
+import {
+  formatCarNumber,
+  isValidPhone,
+  isValidCarNumber,
+  isValidEmail,
+} from "../utils/format";
+import Skeleton from "../components/Skeleton.jsx";
 
 export default function Entry() {
   const [form, setForm] = useState({
@@ -29,8 +35,16 @@ export default function Entry() {
       setLoading(true);
       const data = await createEntry(form);
 
+      if (!isValidCarNumber(form.carNumber)) {
+        return toast.error("Invalid car number (e.g. UP32 GH 1234)");
+      }
+
       if (!isValidPhone(form.phone)) {
         return toast.error("Enter valid 10-digit phone number");
+      }
+
+      if (form.email && !isValidEmail(form.email)) {
+        return toast.error("Enter valid email");
       }
 
       setResult(data);
@@ -105,7 +119,9 @@ export default function Entry() {
               <Input
                 placeholder="XXXXXXXXXX"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })
+                }
               />
             </div>
 

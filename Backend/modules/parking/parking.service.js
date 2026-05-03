@@ -88,7 +88,9 @@ export const findActiveSessionService = async ({ carNumber, phone }) => {
 };
 
 export const exitService = async ({ sessionId }) => {
-  const session = await ParkingSession.findOne({ sessionId });
+  const session = await ParkingSession.findOne({ sessionId }).populate(
+    "slotId",
+  );
 
   if (!session || session.status !== "ACTIVE") {
     throw new Error("Invalid Session");
@@ -107,10 +109,11 @@ export const exitService = async ({ sessionId }) => {
     isOccupied: false,
   });
 
+  console.log(session.slotId.slotNumber);
   if (session.email) {
     const html = generateReceiptHTML({
       carNumber: session.carNumber,
-      slot: session.slotNumber,
+      slot: session.slotId.slotNumber,
       entryTime: session.entryTime,
       exitTime: session.exitTime,
       amount: session.amount,

@@ -7,6 +7,13 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Car } from "lucide-react";
+import Skeleton from "../components/Skeleton";
+import {
+  formatCarNumber,
+  isValidPhone,
+  isValidCarNumber,
+  isValidEmail,
+} from "../utils/format";
 
 export default function Exit() {
   const navigate = useNavigate();
@@ -23,6 +30,18 @@ export default function Exit() {
   const handleFind = async () => {
     if (!form.carNumber || !form.phone) {
       return toast.error("Car number & phone required");
+    }
+
+    if (!isValidCarNumber(form.carNumber)) {
+      return toast.error("Invalid car number (e.g. UP32 GH 1234)");
+    }
+
+    if (!isValidPhone(form.phone)) {
+      return toast.error("Enter valid 10-digit phone number");
+    }
+
+    if (form.email && !isValidEmail(form.email)) {
+      return toast.error("Enter valid email");
     }
 
     try {
@@ -86,10 +105,13 @@ export default function Exit() {
                 Car Number
               </label>
               <Input
-                placeholder="e.g. UP32AB1234"
+                placeholder="e.g. UP32 AB 1234"
                 value={form.carNumber}
                 onChange={(e) =>
-                  setForm({ ...form, carNumber: e.target.value })
+                  setForm({
+                    ...form,
+                    carNumber: formatCarNumber(e.target.value),
+                  })
                 }
               />
             </div>
@@ -99,9 +121,11 @@ export default function Exit() {
                 Phone Number
               </label>
               <Input
-                placeholder="10-digit number"
+                placeholder="XXXXXXXXXX"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })
+                }
               />
             </div>
           </div>
