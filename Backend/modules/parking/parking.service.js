@@ -105,11 +105,10 @@ export const exitService = async ({ sessionId }) => {
 
   await session.save();
 
-  await Slot.findByIdAndUpdate(session.slotId, {
+  await Slot.findByIdAndUpdate(session.slotId._id, {
     isOccupied: false,
   });
 
-  console.log(session.slotId.slotNumber);
   if (session.email) {
     const html = generateReceiptHTML({
       carNumber: session.carNumber,

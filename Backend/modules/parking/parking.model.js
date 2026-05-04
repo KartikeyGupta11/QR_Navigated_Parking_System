@@ -18,6 +18,9 @@ const parkingSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    exitTime: {
+      type: Date,
+    },
     status: {
       type: String,
       enum: ["ACTIVE", "COMPLETED"],
