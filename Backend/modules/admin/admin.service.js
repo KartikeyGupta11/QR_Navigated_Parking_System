@@ -9,11 +9,43 @@ export const getDashboardStatsService = async () => {
     status: "ACTIVE",
   });
 
+  const completedSessions = await ParkingSession.countDocuments({
+    status: "COMPLETED",
+  });
+
+  const occupiedSlots = await Slot.countDocuments({
+    isOccupied: true,
+  });
+
+  const availableSlots = await Slot.countDocuments({
+    isOccupied: false,
+  });
+
+  const revenueResult = await ParkingSession.aggregate([
+    {
+      $match: {
+        paymentStatus: "PAID",
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$amount",
+        },
+      },
+    },
+  ]);
+
+  const totalRevenue = revenueResult[0]?.total || 0;
+
   return {
     totalSlots,
+    activeSessions,
+    completedSessions,
     occupied,
     available: totalSlots - occupied,
-    activeSessions,
+    totalRevenue,
   };
 };
 

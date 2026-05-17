@@ -4,9 +4,13 @@ import toast from "react-hot-toast";
 import Skeleton from "../../components/Skeleton";
 import Row from "../../components/admin/Row";
 import AdminLayout from "../../layouts/AdminLayout";
+import SessionToolbar from "../../components/admin/SessionToolbar";
 
 export default function Sessions() {
   const [sessions, setSessions] = useState(null);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sortOrder, setSortOrder] = useState("LATEST");
 
   const fetchSessions = async () => {
     try {
@@ -25,6 +29,24 @@ export default function Sessions() {
     return () => clearInterval(interval);
   }, []);
 
+  const filteredSessions = sessions
+    ?.filter((s) => {
+      const matchesSearch =
+        s.carNumber.toLowerCase().includes(search.toLowerCase()) ||
+        s.phone.includes(search);
+
+      const matchesStatus = statusFilter === "ALL" || s.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    })
+    ?.sort((a, b) => {
+      if (sortOrder === "LATEST") {
+        return new Date(b.entryTime) - new Date(a.entryTime);
+      }
+
+      return new Date(a.entryTime) - new Date(b.entryTime);
+    });
+
   return (
     <AdminLayout>
       <div className="p-6">
@@ -33,6 +55,14 @@ export default function Sessions() {
           <Skeleton className="w-full h-40" />
         ) : (
           <div className="overflow-x-auto">
+            <SessionToolbar
+              search={search}
+              setSearch={setSearch}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+            />
             <table className="w-full border rounded-xl overflow-hidden">
               <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>
@@ -57,7 +87,7 @@ export default function Sessions() {
                     </td>
                   </tr>
                 ) : (
-                  sessions.map((s, i) => <Row key={i} session={s} />)
+                  filteredSessions.map((s, i) => <Row key={i} session={s} />)
                 )}
               </tbody>
             </table>

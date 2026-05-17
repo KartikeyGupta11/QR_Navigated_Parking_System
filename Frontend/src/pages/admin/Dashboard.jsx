@@ -1,45 +1,37 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
 import AdminLayout from "../../layouts/AdminLayout";
-import StatCard from "../../components/admin/StatCard";
-import Skeleton from "../../components/Skeleton";
+import StatsGrid from "../../components/admin/StatsGrid";
+
 import { getDashboardStats } from "../../api/admin.api";
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
 
+  const fetchStats = async () => {
+    try {
+      const data = await getDashboardStats();
+      setStats(data);
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const data = await getDashboardStats();
-        setStats(data);
-      } catch (error) {
-        toast.error(error.message);
-      }
-    };
     fetchStats();
+
+    const interval = setInterval(fetchStats, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <AdminLayout>
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-6">Dashboard Analytics</h1>
 
-        {!stats ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard title="Total Slots" value={stats.totalSlots} />
-            <StatCard title="Occupied" value={stats.occupied} />
-            <StatCard title="Available" value={stats.available} />
-            <StatCard title="Active Sessions" value={stats.activeSessions} />
-          </div>
-        )}
+        {!stats ? <p>Loading...</p> : <StatsGrid stats={stats} />}
       </div>
     </AdminLayout>
   );
