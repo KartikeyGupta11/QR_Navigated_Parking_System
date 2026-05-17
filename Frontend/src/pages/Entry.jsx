@@ -14,6 +14,7 @@ import {
   isValidEmail,
 } from "../utils/format";
 import Skeleton from "../components/Skeleton.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Entry() {
   const [form, setForm] = useState({
@@ -21,6 +22,7 @@ export default function Entry() {
     phone: "",
     email: "",
   });
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -140,13 +142,22 @@ export default function Entry() {
             </div>
           </div>
 
-          <div className="mt-5">
+          <div className="mt-5 space-y-3">
             <Button
               text="Enter Parking"
               loading={loading}
               onClick={handleSubmit}
               disabled={!isFormValid}
             />
+
+            <motion.button
+              onClick={() => navigate("/")}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              className="w-full py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition font-medium shadow-sm cursor-pointer"
+            >
+              Go to Home
+            </motion.button>
           </div>
 
           {result && (
