@@ -5,12 +5,14 @@ import Skeleton from "../../components/Skeleton";
 import Row from "../../components/admin/Row";
 import AdminLayout from "../../layouts/AdminLayout";
 import SessionToolbar from "../../components/admin/SessionToolbar";
+import { CarFront, CheckCircle2, Clock3 } from "lucide-react";
 
 export default function Sessions() {
   const [sessions, setSessions] = useState(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [sortOrder, setSortOrder] = useState("LATEST");
+  const [slotFilter, setSlotFilter] = useState("ALL");
 
   const fetchSessions = async () => {
     try {
@@ -37,7 +39,9 @@ export default function Sessions() {
 
       const matchesStatus = statusFilter === "ALL" || s.status === statusFilter;
 
-      return matchesSearch && matchesStatus;
+      const matchesSlot = slotFilter === "ALL" || s.slot === slotFilter;
+
+      return matchesSearch && matchesStatus && matchesSlot;
     })
     ?.sort((a, b) => {
       if (sortOrder === "LATEST") {
@@ -50,68 +54,151 @@ export default function Sessions() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-            Parking Sessions
-          </h1>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+              Parking Sessions
+            </h1>
 
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Monitor all parking activity in real time
-          </p>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
+              Monitor all parking activity in real time
+            </p>
+          </div>
+
+          <div
+            className="
+              flex items-center gap-2
+              px-4 py-2 rounded-2xl
+
+              bg-green-100 dark:bg-green-900/30
+              text-green-700 dark:text-green-300
+
+              w-fit
+            "
+          >
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+
+            <p className="text-sm font-medium">Live Updates Active</p>
+          </div>
         </div>
 
         {!sessions ? (
-          <Skeleton className="w-full h-[400px]" />
+          <Skeleton className="w-full h-[500px]" />
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div
                 className="
-                rounded-2xl p-5
-                bg-white dark:bg-gray-800
-                shadow-sm border
-                dark:border-gray-700
-              "
-              >
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Total Sessions
-                </p>
+                  relative overflow-hidden
 
-                <h2 className="text-3xl font-bold mt-2">{sessions.length}</h2>
+                  rounded-3xl p-6
+
+                  bg-white dark:bg-gray-800
+                  border border-gray-200 dark:border-gray-700
+
+                  shadow-sm
+                "
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Total Sessions
+                    </p>
+
+                    <h2 className="text-4xl font-bold mt-3 text-gray-800 dark:text-white">
+                      {sessions.length}
+                    </h2>
+                  </div>
+
+                  <div
+                    className="
+                      w-14 h-14 rounded-2xl
+
+                      flex items-center justify-center
+
+                      bg-blue-100 dark:bg-blue-900/30
+                      text-blue-600 dark:text-blue-400
+                    "
+                  >
+                    <CarFront size={26} />
+                  </div>
+                </div>
               </div>
 
               <div
                 className="
-                rounded-2xl p-5
-                bg-white dark:bg-gray-800
-                shadow-sm border
-                dark:border-gray-700
-              "
-              >
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Active Vehicles
-                </p>
+                  relative overflow-hidden
 
-                <h2 className="text-3xl font-bold mt-2 text-green-600">
-                  {sessions.filter((s) => s.status === "ACTIVE").length}
-                </h2>
+                  rounded-3xl p-6
+
+                  bg-white dark:bg-gray-800
+                  border border-gray-200 dark:border-gray-700
+
+                  shadow-sm
+                "
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Active Vehicles
+                    </p>
+
+                    <h2 className="text-4xl font-bold mt-3 text-green-600">
+                      {sessions.filter((s) => s.status === "ACTIVE").length}
+                    </h2>
+                  </div>
+
+                  <div
+                    className="
+                      w-14 h-14 rounded-2xl
+
+                      flex items-center justify-center
+
+                      bg-green-100 dark:bg-green-900/30
+                      text-green-600 dark:text-green-400
+                    "
+                  >
+                    <Clock3 size={26} />
+                  </div>
+                </div>
               </div>
 
               <div
                 className="
-                rounded-2xl p-5
-                bg-white dark:bg-gray-800
-                shadow-sm border
-                dark:border-gray-700
-              "
-              >
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Completed Sessions
-                </p>
+                  relative overflow-hidden
 
-                <h2 className="text-3xl font-bold mt-2 text-blue-600">
-                  {sessions.filter((s) => s.status === "COMPLETED").length}
-                </h2>
+                  rounded-3xl p-6
+
+                  bg-white dark:bg-gray-800
+                  border border-gray-200 dark:border-gray-700
+
+                  shadow-sm
+                "
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Completed Sessions
+                    </p>
+
+                    <h2 className="text-4xl font-bold mt-3 text-blue-600">
+                      {sessions.filter((s) => s.status === "COMPLETED").length}
+                    </h2>
+                  </div>
+
+                  <div
+                    className="
+                      w-14 h-14 rounded-2xl
+
+                      flex items-center justify-center
+
+                      bg-blue-100 dark:bg-blue-900/30
+                      text-blue-600 dark:text-blue-400
+                    "
+                  >
+                    <CheckCircle2 size={26} />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -122,51 +209,57 @@ export default function Sessions() {
               setStatusFilter={setStatusFilter}
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
+              slotFilter={slotFilter}
+              setSlotFilter={setSlotFilter}
+              sessions={sessions || []}
             />
 
             <div
               className="
-              rounded-2xl overflow-hidden
-              border border-gray-200
-              dark:border-gray-700
-              bg-white dark:bg-gray-800
-              shadow-sm
-            "
+                overflow-hidden rounded-3xl
+
+                border border-gray-200
+                dark:border-gray-700
+
+                bg-white dark:bg-gray-800
+
+                shadow-sm
+              "
             >
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="min-w-[1000px] w-full">
                   <thead
                     className="
-                    sticky top-0 z-10
-                    bg-gray-100 dark:bg-gray-700
-                  "
+                      bg-gray-100/80 dark:bg-gray-700/60
+                      backdrop-blur-xl
+                    "
                   >
                     <tr>
-                      <th className="p-4 text-left text-sm font-semibold">
+                      <th className="p-5 text-left text-xs uppercase tracking-wider text-gray-500">
                         Car
                       </th>
 
-                      <th className="p-4 text-left text-sm font-semibold">
+                      <th className="p-5 text-left text-xs uppercase tracking-wider text-gray-500">
                         Slot
                       </th>
 
-                      <th className="p-4 text-left text-sm font-semibold">
+                      <th className="p-5 text-left text-xs uppercase tracking-wider text-gray-500">
                         Phone
                       </th>
 
-                      <th className="p-4 text-left text-sm font-semibold">
+                      <th className="p-5 text-left text-xs uppercase tracking-wider text-gray-500">
                         Entry Time
                       </th>
 
-                      <th className="p-4 text-left text-sm font-semibold">
+                      <th className="p-5 text-left text-xs uppercase tracking-wider text-gray-500">
                         Exit Time
                       </th>
 
-                      <th className="p-4 text-left text-sm font-semibold">
+                      <th className="p-5 text-left text-xs uppercase tracking-wider text-gray-500">
                         Duration
                       </th>
 
-                      <th className="p-4 text-left text-sm font-semibold">
+                      <th className="p-5 text-left text-xs uppercase tracking-wider text-gray-500">
                         Status
                       </th>
                     </tr>
@@ -178,11 +271,33 @@ export default function Sessions() {
                         <td
                           colSpan="7"
                           className="
-                          text-center py-10
-                          text-gray-500 dark:text-gray-400
-                        "
+                            py-16 text-center
+                            text-gray-500 dark:text-gray-400
+                          "
                         >
-                          No sessions found 🚗
+                          <div className="flex flex-col items-center gap-3">
+                            <div
+                              className="
+                                w-16 h-16 rounded-2xl
+
+                                flex items-center justify-center
+
+                                bg-gray-100 dark:bg-gray-700
+                              "
+                            >
+                              <CarFront size={30} />
+                            </div>
+
+                            <div>
+                              <h3 className="font-semibold text-lg">
+                                No sessions found
+                              </h3>
+
+                              <p className="text-sm mt-1">
+                                Try changing filters or search query
+                              </p>
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     ) : (
