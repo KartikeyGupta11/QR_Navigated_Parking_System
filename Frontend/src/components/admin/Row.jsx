@@ -23,33 +23,81 @@ export default function Row({ session }) {
 
   return (
     <tr
-      className={`border-t hover:bg-gray-50 dark:hover:bg-gray-800 transition ${
-        session.status === "ACTIVE" ? "bg-green-200 dark:bg-green-900/20" : ""
-      }`}
+      className={`
+      border-t border-gray-100
+      dark:border-gray-700
+      transition-all duration-200
+
+      hover:bg-gray-50
+      dark:hover:bg-gray-700/40
+
+      ${
+        session.status === "ACTIVE" ? "bg-green-50/60 dark:bg-green-900/10" : ""
+      }
+    `}
     >
-      <td className="p-3 font-medium">{session.carNumber}</td>
+      <td className="p-4 font-semibold whitespace-nowrap">
+        {session.carNumber}
+      </td>
 
-      <td className="p-3">{session.slot}</td>
+      <td className="p-4">
+        <span
+          className="
+          px-3 py-1 rounded-full
+          bg-blue-100 text-blue-700
+          dark:bg-blue-900/30
+          dark:text-blue-300
+          text-xs font-semibold
+        "
+        >
+          {session.slot}
+        </span>
+      </td>
 
-      <td className="p-3 text-sm">{session.phone}</td>
+      <td className="p-4 text-sm">{session.phone}</td>
 
-      <td className="p-3 text-sm text-gray-500">
+      <td
+        className="
+        p-4 text-sm
+        text-gray-600 dark:text-gray-300
+        whitespace-nowrap
+      "
+      >
         {new Date(session.entryTime).toLocaleString()}
       </td>
 
-      <td className="p-3 text-sm text-gray-500">
+      <td
+        className="
+        p-4 text-sm
+        text-gray-600 dark:text-gray-300
+        whitespace-nowrap
+      "
+      >
         {session.exitTime ? new Date(session.exitTime).toLocaleString() : "-"}
       </td>
 
-      <td className="p-3">{duration}</td>
+      <td className="p-4 font-medium whitespace-nowrap">{duration}</td>
 
-      <td className="p-3">
+      <td className="p-4">
         <span
-          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+          className={`
+          px-3 py-1 rounded-full
+          text-xs font-bold
+
+          ${
             session.status === "ACTIVE"
-              ? "bg-green-100 text-green-700"
-              : "bg-gray-200 text-gray-600"
-          }`}
+              ? `
+                bg-green-100 text-green-700
+                dark:bg-green-900/30
+                dark:text-green-300
+              `
+              : `
+                bg-gray-200 text-gray-700
+                dark:bg-gray-700
+                dark:text-gray-300
+              `
+          }
+        `}
         >
           {session.status}
         </span>

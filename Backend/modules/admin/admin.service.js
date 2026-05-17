@@ -96,3 +96,129 @@ export const getAllSlotsService = async () => {
 
   return result;
 };
+
+export const getAnalyticsService = async () => {
+  const totalSlots = await Slot.countDocuments();
+
+  const occupiedSlots = await Slot.countDocuments({
+    isOccupied: true,
+  });
+
+  const availableSlots = totalSlots - occupiedSlots;
+
+  const activeVehicles = await ParkingSession.countDocuments({
+    status: "ACTIVE",
+  });
+
+  const completedSessions = await ParkingSession.countDocuments({
+    status: "COMPLETED",
+  });
+
+  const occupancyRate =
+    totalSlots === 0 ? 0 : Math.round((occupiedSlots / totalSlots) * 100);
+
+  const revenueResult = await ParkingSession.aggregate([
+    {
+      $match: {
+        paymentStatus: "PAID",
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: {
+          $sum: "$amount",
+        },
+      },
+    },
+  ]);
+
+  const totalRevenue = revenueResult[0]?.totalRevenue || 0;
+
+  const revenueByDay = await ParkingSession.aggregate([
+    {
+      $match: {
+        paymentStatus: "PAID",
+      },
+    },
+    {
+      $group: {
+        _id: {
+          day: {
+            $dayOfMonth: "$createdAt",
+          },
+          month: {
+            $month: "$createdAt",
+          },
+        },
+        revenue: {
+          $sum: "$amount",
+        },
+      },
+    },
+    {
+      $sort: {
+        "_id.month": 1,
+        "_id.day": 1,
+      },
+    },
+  ]);
+
+  const peakHours = await ParkingSession.aggregate([
+    {
+      $group: {
+        _id: {
+          hour: {
+            $hour: "$entryTime",
+          },
+        },
+        totalVehicles: {
+          $sum: 1,
+        },
+      },
+    },
+    {
+      $sort: {
+        totalVehicles: -1,
+      },
+    },
+    {
+      $limit: 5,
+    },
+  ]);
+
+  const paymentStatus = await ParkingSession.aggregate([
+    {
+      $group: {
+        _id: "$paymentStatus",
+        count: {
+          $sum: 1,
+        },
+      },
+    },
+  ]);
+
+  return {
+    cards: {
+      totalRevenue,
+      totalSlots,
+      occupiedSlots,
+      availableSlots,
+      activeVehicles,
+      completedSessions,
+      occupancyRate,
+    },
+
+    revenueChart: revenueByDay.map((r) => ({
+      label: `${r._id.day}/${r._id.month}`,
+      revenue: r.revenue,
+    })),
+
+    peakHours: peakHours.map((p) => ({
+      hour: `${p._id.hour}:00`,
+      vehicles: p.totalVehicles,
+    })),
+
+    paymentStatus,
+  };
+};

@@ -49,12 +49,72 @@ export default function Sessions() {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Active Sessions</h1>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+            Parking Sessions
+          </h1>
+
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Monitor all parking activity in real time
+          </p>
+        </div>
+
         {!sessions ? (
-          <Skeleton className="w-full h-40" />
+          <Skeleton className="w-full h-[400px]" />
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div
+                className="
+                rounded-2xl p-5
+                bg-white dark:bg-gray-800
+                shadow-sm border
+                dark:border-gray-700
+              "
+              >
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Total Sessions
+                </p>
+
+                <h2 className="text-3xl font-bold mt-2">{sessions.length}</h2>
+              </div>
+
+              <div
+                className="
+                rounded-2xl p-5
+                bg-white dark:bg-gray-800
+                shadow-sm border
+                dark:border-gray-700
+              "
+              >
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Active Vehicles
+                </p>
+
+                <h2 className="text-3xl font-bold mt-2 text-green-600">
+                  {sessions.filter((s) => s.status === "ACTIVE").length}
+                </h2>
+              </div>
+
+              <div
+                className="
+                rounded-2xl p-5
+                bg-white dark:bg-gray-800
+                shadow-sm border
+                dark:border-gray-700
+              "
+              >
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Completed Sessions
+                </p>
+
+                <h2 className="text-3xl font-bold mt-2 text-blue-600">
+                  {sessions.filter((s) => s.status === "COMPLETED").length}
+                </h2>
+              </div>
+            </div>
+
             <SessionToolbar
               search={search}
               setSearch={setSearch}
@@ -63,35 +123,78 @@ export default function Sessions() {
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
             />
-            <table className="w-full border rounded-xl overflow-hidden">
-              <thead className="bg-gray-100 dark:bg-gray-700">
-                <tr>
-                  <th className="p-3 text-left">Car</th>
-                  <th className="p-3 text-left">Slot</th>
-                  <th className="p-3 text-left">Phone</th>
-                  <th className="p-3 text-left">Entry Time</th>
-                  <th className="p-3 text-left">Exit Time</th>
-                  <th className="p-3 text-left">Duration</th>
-                  <th className="p-3 text-left">Status</th>
-                </tr>
-              </thead>
 
-              <tbody>
-                {sessions.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan="7"
-                      className="text-center py-6 text-gray-500 dark:text-gray-400"
-                    >
-                      No sessions yet 🚗
-                    </td>
-                  </tr>
-                ) : (
-                  filteredSessions.map((s, i) => <Row key={i} session={s} />)
-                )}
-              </tbody>
-            </table>
-          </div>
+            <div
+              className="
+              rounded-2xl overflow-hidden
+              border border-gray-200
+              dark:border-gray-700
+              bg-white dark:bg-gray-800
+              shadow-sm
+            "
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead
+                    className="
+                    sticky top-0 z-10
+                    bg-gray-100 dark:bg-gray-700
+                  "
+                  >
+                    <tr>
+                      <th className="p-4 text-left text-sm font-semibold">
+                        Car
+                      </th>
+
+                      <th className="p-4 text-left text-sm font-semibold">
+                        Slot
+                      </th>
+
+                      <th className="p-4 text-left text-sm font-semibold">
+                        Phone
+                      </th>
+
+                      <th className="p-4 text-left text-sm font-semibold">
+                        Entry Time
+                      </th>
+
+                      <th className="p-4 text-left text-sm font-semibold">
+                        Exit Time
+                      </th>
+
+                      <th className="p-4 text-left text-sm font-semibold">
+                        Duration
+                      </th>
+
+                      <th className="p-4 text-left text-sm font-semibold">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {filteredSessions.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="7"
+                          className="
+                          text-center py-10
+                          text-gray-500 dark:text-gray-400
+                        "
+                        >
+                          No sessions found 🚗
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredSessions.map((s, i) => (
+                        <Row key={i} session={s} />
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </AdminLayout>

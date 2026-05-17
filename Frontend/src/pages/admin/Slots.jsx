@@ -29,12 +29,18 @@ export default function Slots() {
   return (
     <AdminLayout>
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Parking Slots</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">Smart Parking Slots</h1>
+
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Real-time parking occupancy monitoring
+          </p>
+        </div>
 
         {!slots ? (
           <Skeleton className="w-full h-40" />
         ) : (
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5">
             {slots.map((slot) => (
               <SlotCard key={slot.id} slot={slot} onSelect={setSelected} />
             ))}

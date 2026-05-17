@@ -14,3 +14,8 @@ export const getAllSlots = async () => {
   const res = await axiosInstance.get("/admin/slots");
   return res.data;
 };
+
+export const getAnalytics = async() => {
+  const res = await axiosInstance.get("/admin/analytics");
+  return res.data;
+}
