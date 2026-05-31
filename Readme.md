@@ -2,7 +2,7 @@
 
 ## 🌐 Live Demo
 
-🔗 https://qr-navigated-parking-system-l565cefln.vercel.app/
+🔗 [Demo](https://qr-navigated-parking-system-4h9bb2cnl.vercel.app/)
 
 ---
 
