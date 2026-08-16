@@ -29,3 +29,8 @@ export const getExitQR = async () => {
   const res = await axiosInstance.get("/parking/qr/exit");
   return res.data;
 };
+
+export const getAllParkingAreas = async () => {
+  const res = await axiosInstance.get("/parking/parking-areas");
+  return res.data;
+};

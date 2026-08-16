@@ -8,20 +8,32 @@ import {
   generateReceiptHTML,
   generateEntryHTML,
 } from "../../utils/emailTemplate.js";
+import ParkingArea from "../../models/parkingArea.model.js";
 
 const BASE_URL = process.env.FRONTEND_URL || "http://localhost:5000";
 
 export const checkAvailabilityService = async () => {
-  const slot = await Slot.findOne({ isOccupied: false }).lean();
+  const slot = await Slot.findOne({
+    status: "AVAILABLE",
+  }).lean();
+
   return !!slot;
 };
 
 export const getAvailableSlotCountService = async () => {
-  const count = await Slot.countDocuments({ isOccupied: false });
+  const count = await Slot.countDocuments({
+    status: "AVAILABLE",
+  });
+
   return count;
 };
 
-export const createEntryService = async ({ carNumber, phone, email }) => {
+export const createEntryService = async ({
+  carNumber,
+  phone,
+  email,
+  parkingCode,
+}) => {
   const existing = await ParkingSession.findOne({
     carNumber,
     status: "ACTIVE",
@@ -31,12 +43,23 @@ export const createEntryService = async ({ carNumber, phone, email }) => {
     throw new Error("Car already inside");
   }
 
+  console.log("Parking Code:", parkingCode);
+  const parkingArea = await ParkingArea.findOne({
+    parkingCode,
+    status: "ACTIVE",
+  });
+
+  if (!parkingArea) {
+    throw new Error("Invalid parking location");
+  }
+
   const slot = await Slot.findOneAndUpdate(
     {
-      isOccupied: false,
+      parkingAreaId: parkingArea._id,
+      status: "AVAILABLE",
     },
     {
-      isOccupied: true,
+      status: "OCCUPIED",
     },
     {
       returnDocument: "after",
@@ -52,6 +75,7 @@ export const createEntryService = async ({ carNumber, phone, email }) => {
     carNumber,
     phone,
     email,
+    parkingAreaId: parkingArea._id,
     slotId: slot._id,
   });
 
@@ -72,10 +96,26 @@ export const createEntryService = async ({ carNumber, phone, email }) => {
   return { session, slot };
 };
 
-export const findActiveSessionService = async ({ carNumber, phone }) => {
+export const findActiveSessionService = async ({
+  carNumber,
+  phone,
+  parkingCode,
+}) => {
+  // 1. Find parking area
+  const parkingArea = await ParkingArea.findOne({
+    parkingCode,
+    status: "ACTIVE",
+  });
+
+  if (!parkingArea) {
+    throw new Error("Parking area not found");
+  }
+
+  // 2. Find active session in this parking area
   const session = await ParkingSession.findOne({
     carNumber,
     phone,
+    parkingAreaId: parkingArea._id,
     status: "ACTIVE",
   }).populate("slotId");
 
@@ -84,31 +124,57 @@ export const findActiveSessionService = async ({ carNumber, phone }) => {
   }
 
   const { duration, amount } = calculateAmount(session.entryTime);
-  return { session, duration, amount };
+
+  return {
+    session,
+    duration,
+    amount,
+  };
 };
 
-export const exitService = async ({ sessionId }) => {
-  const session = await ParkingSession.findOne({ sessionId }).populate(
-    "slotId",
-  );
+export const exitService = async ({ sessionId, parkingCode }) => {
+  // 1. Find parking area
+  const parkingArea = await ParkingArea.findOne({
+    parkingCode,
+    status: "ACTIVE",
+  });
 
-  if (!session || session.status !== "ACTIVE") {
+  if (!parkingArea) {
+    throw new Error("Parking area not found");
+  }
+
+  // 2. Find active session
+  const session = await ParkingSession.findOne({
+    sessionId,
+    status: "ACTIVE",
+  }).populate("slotId");
+
+  if (!session) {
     throw new Error("Invalid Session");
   }
 
+  // 3. Verify session belongs to this parking area
+  if (session.parkingAreaId.toString() !== parkingArea._id.toString()) {
+    throw new Error("Session does not belong to this parking area");
+  }
+
+  // 4. Payment validation
   if (session.paymentStatus !== "PAID") {
     throw new Error("Payment required before exit");
   }
 
+  // 5. Complete session
   session.exitTime = new Date();
   session.status = "COMPLETED";
 
   await session.save();
 
+  // 6. Free slot
   await Slot.findByIdAndUpdate(session.slotId._id, {
-    isOccupied: false,
+    status: "AVAILABLE",
   });
 
+  // 7. Send receipt
   if (session.email) {
     const html = generateReceiptHTML({
       carNumber: session.carNumber,
@@ -120,8 +186,8 @@ export const exitService = async ({ sessionId }) => {
 
     await sendEmail({
       to: session.email,
-      subject: "Parking Exit Successfull...",
-      text: `Thankyou for visiting.\n\nCar: ${session.carNumber}\nAmount Paid: ₹${session.amount}`,
+      subject: "Parking Exit Successful...",
+      text: `Thank you for visiting.\n\nCar: ${session.carNumber}\nAmount Paid: ₹${session.amount}`,
       html,
     });
   }
@@ -130,7 +196,9 @@ export const exitService = async ({ sessionId }) => {
 };
 
 export const paymentService = async ({ sessionId }) => {
-  const session = await ParkingSession.findOne({ sessionId });
+  const session = await ParkingSession.findOne({
+    sessionId,
+  });
 
   if (!session || session.status !== "ACTIVE") {
     throw new Error("Invalid Session");
@@ -153,12 +221,122 @@ export const paymentService = async ({ sessionId }) => {
   return session;
 };
 
-export const getEntryQRService = async () => {
-  const url = `${BASE_URL}/entry`;
+export const getEntryQRService = async ({ parkingCode }) => {
+  const parkingArea = await ParkingArea.findOne({
+    parkingCode,
+    status: "ACTIVE",
+  });
+
+  if (!parkingArea) {
+    throw new Error("Parking area not found...");
+  }
+
+  const url = `${BASE_URL}/entry?parkingCode=${parkingArea.parkingCode}`;
+
   return await generateQR(url);
 };
 
-export const getExitQRService = async () => {
-  const url = `${BASE_URL}/exit`;
+export const getExitQRService = async ({ parkingCode }) => {
+  const parkingArea = await ParkingArea.findOne({
+    parkingCode,
+    status: "ACTIVE",
+  });
+
+  if (!parkingArea) {
+    throw new Error("Parking area not found");
+  }
+
+  const url = `${BASE_URL}/exit?parkingCode=${parkingArea.parkingCode}`;
+
   return await generateQR(url);
+};
+
+export const getAllParkingAreasService = async () => {
+  const parkingAreas = await ParkingArea.find({
+    status: "ACTIVE",
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const result = await Promise.all(
+    parkingAreas.map(async (area) => {
+      const [
+        totalSlots,
+        availableSlots,
+        occupiedSlots,
+        reservedSlots,
+        maintenanceSlots,
+        revenueResult,
+      ] = await Promise.all([
+        Slot.countDocuments({
+          parkingAreaId: area._id,
+        }),
+
+        Slot.countDocuments({
+          parkingAreaId: area._id,
+          status: "AVAILABLE",
+        }),
+
+        Slot.countDocuments({
+          parkingAreaId: area._id,
+          status: "OCCUPIED",
+        }),
+
+        Slot.countDocuments({
+          parkingAreaId: area._id,
+          status: "RESERVED",
+        }),
+
+        Slot.countDocuments({
+          parkingAreaId: area._id,
+          status: "MAINTENANCE",
+        }),
+
+        ParkingSession.aggregate([
+          {
+            $match: {
+              parkingAreaId: area._id,
+              paymentStatus: "PAID",
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalRevenue: {
+                $sum: "$amount",
+              },
+            },
+          },
+        ]),
+      ]);
+
+      const totalRevenue = revenueResult[0]?.totalRevenue || 0;
+
+      const occupancyRate =
+        totalSlots === 0 ? 0 : Math.round((occupiedSlots / totalSlots) * 100);
+
+      return {
+        id: area._id,
+        parkingName: area.parkingName,
+        parkingCode: area.parkingCode,
+        address: area.address,
+        status: area.status,
+        operatingHours: area.operatingHours,
+
+        totalSlots,
+        availableSlots,
+        occupiedSlots,
+        reservedSlots,
+        maintenanceSlots,
+
+        occupancyRate,
+        totalRevenue,
+
+        createdAt: area.createdAt,
+        updatedAt: area.updatedAt,
+      };
+    }),
+  );
+
+  return result;
 };

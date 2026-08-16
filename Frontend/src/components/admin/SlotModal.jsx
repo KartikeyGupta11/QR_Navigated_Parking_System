@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 export default function SlotModal({ slot, onClose }) {
   if (!slot) return null;
 
+  const status = slot.slotStatus;
+
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
       <motion.div
@@ -14,21 +16,49 @@ export default function SlotModal({ slot, onClose }) {
           Slot {slot.slotNumber}
         </h2>
 
-        {slot.isOccupied ? (
+        {status === "OCCUPIED" && (
           <div className="space-y-2 text-sm">
             <p>
-              <strong>Car:</strong> {slot.session?.carNumber}
+              <strong>Car:</strong> {slot.session?.carNumber || "-"}
             </p>
+
             <p>
               <strong>Entry:</strong>{" "}
-              {new Date(slot.session?.entryTime).toLocaleString()}
+              {slot.session?.entryTime
+                ? new Date(slot.session.entryTime).toLocaleString()
+                : "-"}
             </p>
+
             <p>
-              <strong>Status:</strong> {slot.session?.status}
+              <strong>Status:</strong> {slot.session?.status || "ACTIVE"}
             </p>
           </div>
-        ) : (
-          <p className="text-center text-gray-500">Slot is available</p>
+        )}
+
+        {status === "AVAILABLE" && (
+          <p className="text-center text-green-500">Slot is available</p>
+        )}
+
+        {status === "RESERVED" && (
+          <div className="text-center space-y-2">
+            <p className="text-yellow-500 font-medium">Slot is reserved</p>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Reserved for an upcoming booking.
+            </p>
+          </div>
+        )}
+
+        {status === "MAINTENANCE" && (
+          <div className="text-center space-y-2">
+            <p className="text-gray-500 font-medium">
+              Slot is under maintenance
+            </p>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              This slot is currently unavailable.
+            </p>
+          </div>
         )}
 
         <button

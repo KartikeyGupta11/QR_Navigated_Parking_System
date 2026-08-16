@@ -3,7 +3,6 @@ import ParkingSession from "../../modules/parking/parking.model.js";
 
 export const getDashboardStatsService = async () => {
   const totalSlots = await Slot.countDocuments();
-  const occupied = await Slot.countDocuments({ isOccupied: true });
 
   const activeSessions = await ParkingSession.countDocuments({
     status: "ACTIVE",
@@ -14,11 +13,11 @@ export const getDashboardStatsService = async () => {
   });
 
   const occupiedSlots = await Slot.countDocuments({
-    isOccupied: true,
+    status: "OCCUPIED",
   });
 
   const availableSlots = await Slot.countDocuments({
-    isOccupied: false,
+    status: "AVAILABLE",
   });
 
   const revenueResult = await ParkingSession.aggregate([
@@ -44,7 +43,7 @@ export const getDashboardStatsService = async () => {
     activeSessions,
     completedSessions,
     occupied,
-    available: totalSlots - occupied,
+    available: availableSlots,
     totalRevenue,
   };
 };
@@ -72,7 +71,7 @@ export const getAllSlotsService = async () => {
   for (const slot of slots) {
     let activeSession = null;
 
-    if (slot.isOccupied) {
+    if (slot.status === "OCCUPIED") {
       activeSession = await ParkingSession.findOne({
         slotId: slot._id,
         status: "ACTIVE",
@@ -82,7 +81,7 @@ export const getAllSlotsService = async () => {
     result.push({
       id: slot._id,
       slotNumber: slot.slotNumber,
-      isOccupied: slot.isOccupied,
+      slotStatus: slot.status,
       session: activeSession
         ? {
             carNumber: activeSession.carNumber,
@@ -101,10 +100,12 @@ export const getAnalyticsService = async () => {
   const totalSlots = await Slot.countDocuments();
 
   const occupiedSlots = await Slot.countDocuments({
-    isOccupied: true,
+    status: "OCCUPIED",
   });
 
-  const availableSlots = totalSlots - occupiedSlots;
+  const availableSlots = await Slot.countDocuments({
+    status: "AVAILABLE",
+  });
 
   const activeVehicles = await ParkingSession.countDocuments({
     status: "ACTIVE",

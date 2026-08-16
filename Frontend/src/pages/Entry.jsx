@@ -14,7 +14,7 @@ import {
   isValidEmail,
 } from "../utils/format";
 import Skeleton from "../components/Skeleton.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Entry() {
   const [form, setForm] = useState({
@@ -23,31 +23,44 @@ export default function Entry() {
     email: "",
   });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const isFormValid = form.carNumber.length >= 8 && isValidPhone(form.phone);
+  const parkingCode = searchParams.get("parkingCode");
 
   const handleSubmit = async () => {
+    if (!parkingCode) {
+      return toast.error("Parking location not specified");
+    }
+
     if (!form.carNumber || !form.phone) {
       return toast.error("Car number & phone required");
     }
 
+    if (!form.carNumber || !form.phone) {
+      return toast.error("Car number & phone required");
+    }
+
+    if (!isValidCarNumber(form.carNumber)) {
+      return toast.error("Invalid car number (e.g. UP32 GH 1234)");
+    }
+
+    if (!isValidPhone(form.phone)) {
+      return toast.error("Enter valid 10-digit phone number");
+    }
+
+    if (form.email && !isValidEmail(form.email)) {
+      return toast.error("Enter valid email");
+    }
+
     try {
       setLoading(true);
-      const data = await createEntry(form);
-
-      if (!isValidCarNumber(form.carNumber)) {
-        return toast.error("Invalid car number (e.g. UP32 GH 1234)");
-      }
-
-      if (!isValidPhone(form.phone)) {
-        return toast.error("Enter valid 10-digit phone number");
-      }
-
-      if (form.email && !isValidEmail(form.email)) {
-        return toast.error("Enter valid email");
-      }
+      const data = await createEntry({
+        ...form,
+        parkingCode,
+      });
 
       setResult(data);
       toast.success("Entry Successful 🚗");

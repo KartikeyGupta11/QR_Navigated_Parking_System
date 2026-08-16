@@ -7,12 +7,14 @@ import Success from "../pages/Success";
 import Dashboard from "../pages/admin/Dashboard";
 import Sessions from "../pages/admin/Sessions";
 import Slots from "../pages/admin/Slots";
+import ParkingAreaMap from "../pages/parkingAreaMap";
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* <Route path="/" element={<Home />} /> */}
+        <Route path="/" element={<ParkingAreaMap />} />
         <Route path="/entry" element={<Entry />} />
         <Route path="/exit" element={<Exit />} />
         <Route path="/payment" element={<Payment />} />

@@ -23,13 +23,13 @@ export default function Payment() {
     );
   }
 
-  const { sessionId, amount, carNumber } = state;
+  const { sessionId, amount, carNumber, parkingCode } = state;
 
   const handlePayment = async () => {
     try {
       setLoading(true);
       await makePayment({ sessionId });
-      await exitParking({ sessionId });
+      await exitParking({ sessionId, parkingCode });
 
       toast.success("Payment Successful & Exit Completed");
       navigate("/success", {

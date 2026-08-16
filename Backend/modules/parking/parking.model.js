@@ -10,6 +10,11 @@ const parkingSchema = new mongoose.Schema(
     carNumber: String,
     phone: String,
     email: String,
+    parkingAreaId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ParkingArea",
+      required: true,
+    },
     slotId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Slot",

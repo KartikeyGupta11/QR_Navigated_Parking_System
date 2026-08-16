@@ -7,6 +7,7 @@ import {
   paymentService,
   getEntryQRService,
   getExitQRService,
+  getAllParkingAreasService,
 } from "./parking.service.js";
 import { asyncHandler } from "../../middlewares/asyncHandler.js";
 
@@ -65,4 +66,16 @@ export const getEntryQR = async (req, res) => {
 export const getExitQR = async (req, res) => {
   const qr = await getExitQRService();
   res.json({ qr });
+};
+
+export const getAllParkingAreas = async (req, res) => {
+  try {
+    const parkingAreas = await getAllParkingAreasService();
+
+    res.status(200).json(parkingAreas);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };

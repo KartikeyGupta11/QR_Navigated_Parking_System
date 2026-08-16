@@ -4,7 +4,7 @@ import Input from "../components/Input";
 import Button from "../components/Buttons";
 import { exitParking, findSession, makePayment } from "../api/parking.api";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Car } from "lucide-react";
 import Skeleton from "../components/Skeleton";
@@ -17,6 +17,7 @@ import {
 
 export default function Exit() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [form, setForm] = useState({
     carNumber: "",
@@ -26,8 +27,13 @@ export default function Exit() {
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState(null);
   const [sessionId, setSessionId] = useState(null);
+  const parkingCode = searchParams.get("parkingCode");
 
   const handleFind = async () => {
+    if (!parkingCode) {
+      return toast.error("Parking location not specified");
+    }
+
     if (!form.carNumber || !form.phone) {
       return toast.error("Car number & phone required");
     }
@@ -46,7 +52,10 @@ export default function Exit() {
 
     try {
       setLoading(true);
-      const data = await findSession(form);
+      const data = await findSession({
+        ...form,
+        parkingCode,
+      });
 
       setSessionId(data.sessionId);
       setAmount(data.amount);
@@ -65,6 +74,7 @@ export default function Exit() {
         sessionId,
         amount,
         carNumber: form.carNumber,
+        parkingCode,
       },
     });
   };
